@@ -1,0 +1,219 @@
+<section id="torch-toolbar">
+  <div class="torch-container">
+    <%= link "New User", to: Routes.admin_user_path(@conn, :new) %>
+  </div>
+</section>
+<section id="torch-index-content">
+  <div class="torch-container">
+    <section id="torch-filters">
+      <h3>Find Users</h3>
+      <%= form_tag @conn.request_path, method: :get, id: "torch-filters-form" do %>
+        <div class="field">
+          <label>ID</label>
+          <%= number_filter_select(:user, :id, @conn.params) %>
+          <%= filter_number_input(:user, :id, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Email</label>
+          <%= filter_select(:user, :email, @conn.params) %>
+          <%= filter_string_input(:user, :email, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>First name</label>
+          <%= filter_select(:user, :first_name, @conn.params) %>
+          <%= filter_string_input(:user, :first_name, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Last name</label>
+          <%= filter_select(:user, :last_name, @conn.params) %>
+          <%= filter_string_input(:user, :last_name, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Phone number</label>
+          <%= filter_select(:user, :phone_number, @conn.params) %>
+          <%= filter_string_input(:user, :phone_number, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Vehicle make</label>
+          <%= filter_select(:user, :vehicle_make, @conn.params) %>
+          <%= filter_string_input(:user, :vehicle_make, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Vehicle make argyle</label>
+          <%= filter_select(:user, :vehicle_make_argyle, @conn.params) %>
+          <%= filter_string_input(:user, :vehicle_make_argyle, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Vehicle model</label>
+          <%= filter_select(:user, :vehicle_model, @conn.params) %>
+          <%= filter_string_input(:user, :vehicle_model, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Vehicle model argyle</label>
+          <%= filter_select(:user, :vehicle_model_argyle, @conn.params) %>
+          <%= filter_string_input(:user, :vehicle_model_argyle, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Vehicle type</label>
+          <%= filter_select(:user, :vehicle_type, @conn.params) %>
+          <%= filter_string_input(:user, :vehicle_type, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Device platform</label>
+          <%= filter_select(:user, :device_platform, @conn.params) %>
+          <%= filter_string_input(:user, :device_platform, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Focus group</label>
+          <%= filter_select(:user, :focus_group, @conn.params) %>
+          <%= filter_string_input(:user, :focus_group, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Engine type</label>
+          <%= filter_select(:user, :engine_type, @conn.params) %>
+          <%= filter_string_input(:user, :engine_type, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Country</label>
+          <%= filter_select(:user, :country, @conn.params) %>
+          <%= filter_string_input(:user, :country, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Country argyle</label>
+          <%= filter_select(:user, :country_argyle, @conn.params) %>
+          <%= filter_string_input(:user, :country_argyle, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Postal code</label>
+          <%= filter_select(:user, :postal_code, @conn.params) %>
+          <%= filter_string_input(:user, :postal_code, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Postal code argyle</label>
+          <%= filter_select(:user, :postal_code_argyle, @conn.params) %>
+          <%= filter_string_input(:user, :postal_code_argyle, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Car ownership</label>
+          <%= filter_select(:user, :car_ownership, @conn.params) %>
+          <%= filter_string_input(:user, :car_ownership, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Role</label>
+          <%= filter_select(:user, :role, @conn.params) %>
+          <%= filter_string_input(:user, :role, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Timezone</label>
+          <%= filter_select(:user, :timezone, @conn.params) %>
+          <%= filter_string_input(:user, :timezone, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Timezone device</label>
+          <%= filter_select(:user, :timezone_device, @conn.params) %>
+          <%= filter_string_input(:user, :timezone_device, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Timezone argyle</label>
+          <%= filter_select(:user, :timezone_argyle, @conn.params) %>
+          <%= filter_string_input(:user, :timezone_argyle, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Argyle token</label>
+          <%= filter_select(:user, :argyle_token, @conn.params) %>
+          <%= filter_string_input(:user, :argyle_token, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Argyle user</label>
+          <%= filter_select(:user, :argyle_user_id, @conn.params) %>
+          <%= filter_string_input(:user, :argyle_user_id, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Deleted</label>
+          <%= filter_boolean_input(:user, :deleted, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Vehicle year</label>
+          <%= number_filter_select(:user, :vehicle_year, @conn.params) %>
+          <%= filter_number_input(:user, :vehicle_year, @conn.params) %>
+        </div>
+
+        <div class="field">
+          <label>Vehicle year argyle</label>
+          <%= number_filter_select(:user, :vehicle_year_argyle, @conn.params) %>
+          <%= filter_number_input(:user, :vehicle_year_argyle, @conn.params) %>
+        </div>
+
+        <button type="submit" class="torch-button">Search</button>
+        <%= link "Clear Filters", to: Routes.admin_user_path(@conn, :index) %>
+      <% end %>
+    </section>
+
+    <section id="torch-table">
+    <%= if length(@users) > 0 do %>
+      <table>
+        <thead>
+          <tr>
+            <th><%= table_link(@conn, "ID", :id) %></th>
+            <th><%= table_link(@conn, "Email", :email) %></th>
+            <th><%= table_link(@conn, "First name", :first_name) %></th>
+            <th><%= table_link(@conn, "Last name", :last_name) %></th>
+            <th><%= table_link(@conn, "Channel", :is_beta) %></th>
+            <th><%= table_link(@conn, "Focus group", :focus_group) %></th>
+            <th><%= table_link(@conn, "Role", :role) %></th>
+            <th><%= table_link(@conn, "Active?", :deleted) %></th>
+            <th><span>Actions</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <%= for user <- @users do %>
+            <tr>
+              <td><%= user.id %></td>
+              <td><%= user.email %></td>
+              <td><%= user.first_name %></td>
+              <td><%= user.last_name %></td>
+              <td><%= user.is_beta %></td>
+              <td><%= user.focus_group %></td>
+              <td><%= user.role %></td>
+              <td><%= if user.deleted, do: "❌", else: "✅" %></td>
+
+              <td class="torch-actions">
+                <span><%= link "Show", to: Routes.admin_user_path(@conn, :show, user) %></span>
+                <span><%= link "Edit", to: Routes.admin_user_path(@conn, :edit, user) %></span>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <%= render Torch.PaginationView, "_pagination.html", assigns %>
+    <% else %>
+      <p class="torch-no-data">No Users match your search.</p>
+    <% end %>
+    </section>
+  </div>
+</section>

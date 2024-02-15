@@ -1,0 +1,18 @@
+<h1>Show Session</h1>
+
+<ul>
+
+  <li>
+    <strong>Email:</strong>
+    <%= @session.email %>
+  </li>
+
+  <li>
+    <strong>Password:</strong>
+    <%= @session.password %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.admin_session_path(@conn, :edit, @session) %></span>
+<span><%= link "Back", to: Routes.admin_session_path(@conn, :index) %></span>

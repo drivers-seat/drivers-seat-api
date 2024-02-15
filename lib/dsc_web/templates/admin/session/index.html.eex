@@ -1,0 +1,28 @@
+<h1>Listing Sessions</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Email</th>
+      <th>Password</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for session <- @sessions do %>
+    <tr>
+      <td><%= session.email %></td>
+      <td><%= session.password %></td>
+
+      <td>
+        <span><%= link "Show", to: Routes.admin_session_path(@conn, :show, session) %></span>
+        <span><%= link "Edit", to: Routes.admin_session_path(@conn, :edit, session) %></span>
+        <span><%= link "Delete", to: Routes.admin_session_path(@conn, :delete, session), method: :delete, data: [confirm: "Are you sure?"] %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Session", to: Routes.admin_session_path(@conn, :new) %></span>

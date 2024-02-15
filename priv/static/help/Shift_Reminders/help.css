@@ -1,0 +1,69 @@
+* {
+  font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-size: 1em;
+  line-height: 1.4;
+}
+
+.article {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+
+.help_index {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+
+.spacer {
+  flex-grow: 1;
+}
+
+.article-body {
+  flex-grow: 0;
+  max-width: 640px;
+  padding-top: 20px;
+  padding-top: 20px;
+}
+
+.toc {
+  flex-grow: 0;
+  max-width: 640px;
+  padding-top: 20px;
+  padding-top: 20px;
+}
+.toc li {
+  padding-bottom: 5px;
+}
+
+.toc a {
+  color: blue;
+}
+.toc a:visited {
+  color: blue;
+}
+
+.title {
+  font-size: 1.8em;
+  font-weight: bold;
+  padding-bottom: 10px;
+}
+
+.description {
+  font-size: 1.6em;
+  color: gray;
+  font-weight: normal;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+h1 {
+  font-size: 1.6em;
+  font-weight: normal;
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: 1.2em;
+}

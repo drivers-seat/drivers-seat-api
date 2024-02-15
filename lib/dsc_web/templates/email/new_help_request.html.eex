@@ -1,0 +1,31 @@
+<div>
+  <div>Hello!</div>
+  <br/>
+  A new help request has been submitted
+  <br/>
+  <div>USER INFO:<div>
+  <table>
+    <tr><td>ID</td><td><%=@user_id%></td></tr>
+    <tr><td>Name</td><td><%= @name%></td></tr>
+    <tr><td>Email Address</td><td><%= @email_address%></td></tr>
+  </table>
+
+  <br/>
+  <div>DEVICE INFO:<div>
+  <table>
+    <tr><td>Device ID</td><td><%= @device_id%></td></tr>
+    <tr><td>App Version</td><td><%= @app_version%></td></tr>
+    <tr><td>Platform</td><td><%= @device_platform%></td></tr>
+    <tr><td>Platform OS</td><td><%= @device_os%></td></tr>
+    <tr><td>Location Tracking</td><td><%= @location_tracking_config_status%></td></tr>
+  </table>  
+  <br/>
+  <br/>
+  <div>HELP REQUEST INFO:</div>
+  <div>
+    <%= @subject%>
+  <div>
+  <div>
+    <%= @description%>
+  </div>
+</div>

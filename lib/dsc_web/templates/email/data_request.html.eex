@@ -1,0 +1,3 @@
+<div>
+  User with ID <%= @user.id %> and email <%= @user.email %> has requested their data.
+</div>

@@ -1,0 +1,13 @@
+<div>
+  <div><%= hello_greeting(@user) %></div>
+  <br/>
+  <div>We've processed your request to download your earnings and mileage data for <%= @date_start %> - <%= @date_end %>.  Click the button below to download the result.</div>
+  <br/>
+  <%= link "Download", to: @download_url, style: "padding: 6px 8px; line-height: 1.5; border-radius: 4px; text-transform: none; cursor: pointer; text-decoration: none; border: 1px solid #007bff; background-color: #007bff; color: #fff; text-align: center; vertical-align: middle;" %>
+  <br/>
+  <br/>
+  <div>If you did not request to download your earnings and mileage, please let us know.  This link will expire in 24 hours.</div>
+  <br/>
+  <div>Thank you,</div>
+  <div>Driver's Seat Coop</div>
+</div>

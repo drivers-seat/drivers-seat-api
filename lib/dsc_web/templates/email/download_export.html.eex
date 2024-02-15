@@ -1,0 +1,14 @@
+<div>
+  <div>Hello!</div>
+  <br/>
+  <div>
+  A new data export is available.  Click the button below to download the file.</div>
+  <br/>
+  <%= link "Download", to: @download_url, style: "padding: 6px 8px; line-height: 1.5; border-radius: 4px; text-transform: none; cursor: pointer; text-decoration: none; border: 1px solid #007bff; background-color: #007bff; color: #fff; text-align: center; vertical-align: middle;" %>
+  <br/>
+  <br/>
+  <div>If you have any questions, please contact <a href="mailto:olivia@driversseat.co">Olivia D'Angelo</a>.</div>
+  <br/>
+  <div>Thank you,</div>
+  <div>Driver's Seat Coop</div>
+</div>
