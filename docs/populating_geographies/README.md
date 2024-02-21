@@ -32,8 +32,9 @@ All data comes from the Census Bureau Tiger Web DB
 2. Execute code to retrieve and populate regions.  **These statements need to be run in the order presented**
 
     ```elixir
-    DriversSeatCoop.Regions.CensusTigerDB.update_states()         # takes about 5 minutes
-    DriversSeatCoop.Regions.CensusTigerDB.update_counties()       # takes about 15 minutes
-    DriversSeatCoop.Regions.CensusTigerDB.update_metro_areas()    # takes about 15 minutes
-    DriversSeatCoop.Regions.CensusTigerDB.update_postal_codes()   # takes about 2-hours
+    DriversSeatCoop.Regions.CensusTigerDB.update_states()               # takes about 5 minutes
+    DriversSeatCoop.Regions.CensusTigerDB.update_counties()             # takes about 15 minutes
+    DriversSeatCoop.Regions.CensusTigerDB.update_metropolitan_areas()   # takes about 10 minutes
+    DriversSeatCoop.Regions.CensusTigerDB.update_micropolitan_areas()   # takes about 15 minutes
+    DriversSeatCoop.Regions.CensusTigerDB.update_postal_codes()         # takes about 2-hours
     ```
