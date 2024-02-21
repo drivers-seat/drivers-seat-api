@@ -72,6 +72,20 @@ defmodule DriversSeatCoop.Regions do
     |> Repo.one()
   end
 
+  def get_county_for_point(nil = _point), do: nil
+
+  def get_county_for_point(%Geo.Point{} = point) do
+    query_counties()
+    |> query_county_contains_point(point)
+    |> select([m], %{
+      id: m.id,
+      region_id_state: m.region_id_state,
+      name: m.name
+    })
+    |> limit(1)
+    |> Repo.one()
+  end
+
   def get_metro_areas do
     query_metro_areas()
     |> Repo.all()
@@ -113,4 +127,185 @@ defmodule DriversSeatCoop.Regions do
 
   def query_metro_area_contains_point(qry, %Geo.Point{} = point),
     do: where(qry, [m], st_within(^point, m.geometry))
+
+  def query_county_contains_point(qry, %Geo.Point{} = point),
+    do: where(qry, [m], st_within(^point, m.geometry))
+
+  defmodule CensusTigerDB do
+    alias DriversSeatCoop.Regions
+
+    @tiger_url "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Census2020/MapServer"
+
+    @state_layer_id 80
+    @county_layer_id 82
+    @micro_area_layer_id 78
+    @metro_area_layer_id 76
+    @postal_code_layer_id 84
+
+    def update_states(offset \\ 0, batch_size \\ 10) do
+      result = query_tiger_db(@state_layer_id, offset, batch_size)
+
+      result
+      |> Enum.each(fn state_obj ->
+        props = Map.get(state_obj, "properties")
+
+        state_attr = %{
+          id: Map.get(props, "STATE"),
+          name: Map.get(props, "NAME"),
+          abbrv: Map.get(props, "STUSAB"),
+          geometry:
+            Map.get(state_obj, "geometry")
+            |> Map.put("srid", "4326")
+        }
+
+        State.sync_changeset(%State{}, state_attr)
+        |> Repo.insert(
+          on_conflict: :replace_all,
+          conflict_target: [:name]
+        )
+      end)
+
+      if Enum.count(result) == batch_size, do: update_states(offset + batch_size, batch_size)
+    end
+
+    def update_counties(offset \\ 0, batch_size \\ 50) do
+      result = query_tiger_db(@county_layer_id, offset, batch_size)
+
+      result
+      |> Enum.each(fn county_obj ->
+        props = Map.get(county_obj, "properties")
+
+        county_attr = %{
+          id: Map.get(props, "OBJECTID"),
+          region_id_state: Map.get(props, "STATE"),
+          name: Map.get(props, "NAME"),
+          geometry: Map.get(county_obj, "geometry")
+        }
+
+        County.sync_changeset(%County{}, county_attr)
+        |> Repo.insert(
+          on_conflict: :replace_all,
+          conflict_target: [:region_id_state, :name]
+        )
+      end)
+
+      if Enum.count(result) == batch_size, do: update_counties(offset + batch_size, batch_size)
+    end
+
+    def update_metropolitan_areas(offset \\ 0, batch_size \\ 50) do
+      result = query_tiger_db(@metro_area_layer_id, offset, batch_size)
+
+      result
+      |> Enum.each(fn metro_obj ->
+        props = Map.get(metro_obj, "properties")
+
+        metro_attr = %{
+          id: Map.get(props, "OBJECTID"),
+          name: Map.get(props, "BASENAME"),
+          full_name: Map.get(props, "NAME"),
+          geometry: Map.get(metro_obj, "geometry")
+        }
+
+        MetroArea.sync_changeset(%MetroArea{}, metro_attr)
+        |> Repo.insert(
+          on_conflict: {:replace, [:name, :full_name, :geometry]},
+          conflict_target: [:name]
+        )
+      end)
+
+      if Enum.count(result) == batch_size,
+        do: update_metropolitan_areas(offset + batch_size, batch_size)
+    end
+
+    def update_micropolitan_areas(offset \\ 0, batch_size \\ 50) do
+      result = query_tiger_db(@micro_area_layer_id, offset, batch_size)
+
+      result
+      |> Enum.each(fn metro_obj ->
+        props = Map.get(metro_obj, "properties")
+
+        metro_attr = %{
+          id: Map.get(props, "OBJECTID"),
+          name: Map.get(props, "BASENAME"),
+          full_name: Map.get(props, "NAME"),
+          geometry: Map.get(metro_obj, "geometry")
+        }
+
+        MetroArea.sync_changeset(%MetroArea{}, metro_attr)
+        |> Repo.insert(
+          on_conflict: {:replace, [:name, :full_name, :geometry]},
+          conflict_target: [:name]
+        )
+      end)
+
+      if Enum.count(result) == batch_size,
+        do: update_micropolitan_areas(offset + batch_size, batch_size)
+    end
+
+    def update_postal_codes(offset \\ 0, batch_size \\ 200) do
+      result = query_tiger_db(@postal_code_layer_id, offset, batch_size)
+
+      result
+      |> Enum.each(fn postal_code_obj ->
+        props = Map.get(postal_code_obj, "properties")
+
+        {center_lat, _} = Float.parse(Map.get(props, "INTPTLAT"))
+        {center_lon, _} = Float.parse(Map.get(props, "INTPTLON"))
+
+        center_point = %Geo.Point{coordinates: {center_lon, center_lat}}
+
+        county = Regions.get_county_for_point(center_point) || %{}
+
+        postal_code_attr = %{
+          id: Map.get(props, "OBJECTID"),
+          postal_code: Map.get(props, "BASENAME"),
+          geometry: Map.get(postal_code_obj, "geometry"),
+          region_id_metro_area: Regions.get_metro_area_id_for_point(center_point),
+          region_id_county: Map.get(county, :id),
+          region_id_state: Map.get(county, :region_id_state)
+        }
+
+        {:ok, _} =
+          PostalCode.sync_changeset(%PostalCode{}, postal_code_attr)
+          |> Repo.insert(
+            on_conflict: :replace_all,
+            conflict_target: [:postal_code]
+          )
+      end)
+
+      if Enum.count(result) == batch_size,
+        do: update_postal_codes(offset + batch_size, batch_size)
+    end
+
+    defp query_tiger_db(layer_id, offset, batch_size) do
+      qry_param = %{
+        f: "geojson",
+        outSR: 4326,
+        geometryPrecision: 500_000_000,
+        outFields: "*",
+        where: "1=1",
+        resultOffset: offset,
+        resultRecordCount: batch_size,
+        orderByFields: "OBJECTID"
+      }
+
+      qry_param = URI.encode_query(qry_param, :rfc3986)
+
+      url = "#{@tiger_url}/#{layer_id}/query?#{qry_param}"
+      Logger.warn(url)
+      {:ok, result} = http(:get, url)
+      Map.get(result, "features")
+    end
+
+    defp http(method, url, body \\ [], header \\ []) do
+      {:ok, response} = HTTPoison.request(method, url, body, header, recv_timeout: :infinity)
+
+      case {response.status_code, response.body} do
+        {204, _} -> {:ok, nil}
+        {200, nil} -> {:ok, nil}
+        {200, body} -> {:ok, Jason.decode!(body)}
+        {_, body} -> {:error, body}
+      end
+    end
+  end
 end
