@@ -179,7 +179,7 @@ defmodule DriversSeatCoop.Regions do
         abbrv: Map.get(props, "STUSAB"),
         geometry:
           Map.get(state_obj, "geometry")
-          |> add_srid_to_geoJSON()
+          |> add_srid_to_geo_json()
       }
     end
 
@@ -220,7 +220,7 @@ defmodule DriversSeatCoop.Regions do
         name: Map.get(props, "NAME"),
         geometry:
           Map.get(county_obj, "geometry")
-          |> add_srid_to_geoJSON()
+          |> add_srid_to_geo_json()
       }
     end
 
@@ -267,7 +267,7 @@ defmodule DriversSeatCoop.Regions do
         full_name: Map.get(props, "NAME"),
         geometry:
           Map.get(metro_obj, "geometry")
-          |> add_srid_to_geoJSON()
+          |> add_srid_to_geo_json()
       }
     end
 
@@ -314,14 +314,14 @@ defmodule DriversSeatCoop.Regions do
         postal_code: Map.get(props, "BASENAME"),
         geometry:
           Map.get(postal_code_obj, "geometry")
-          |> add_srid_to_geoJSON(),
+          |> add_srid_to_geo_json(),
         region_id_metro_area: Regions.get_metro_area_id_for_point(center_point),
         region_id_county: Map.get(county, :id),
         region_id_state: Map.get(county, :region_id_state)
       }
     end
 
-    defp add_srid_to_geoJSON(geometry),
+    defp add_srid_to_geo_json(geometry),
       do:
         Geo.JSON.decode!(geometry)
         |> Map.put(:srid, 4326)
