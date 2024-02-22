@@ -179,7 +179,7 @@ defmodule DriversSeatCoop.Regions do
         abbrv: Map.get(props, "STUSAB"),
         geometry:
           Map.get(state_obj, "geometry")
-          |> Map.put("srid", "4326")
+          |> add_srid_to_geoJSON()
       }
     end
 
@@ -218,7 +218,9 @@ defmodule DriversSeatCoop.Regions do
         id: Map.get(props, "OBJECTID"),
         region_id_state: Map.get(props, "STATE"),
         name: Map.get(props, "NAME"),
-        geometry: Map.get(county_obj, "geometry")
+        geometry:
+          Map.get(county_obj, "geometry")
+          |> add_srid_to_geoJSON()
       }
     end
 
@@ -263,7 +265,9 @@ defmodule DriversSeatCoop.Regions do
         id: Map.get(props, "OBJECTID"),
         name: Map.get(props, "BASENAME"),
         full_name: Map.get(props, "NAME"),
-        geometry: Map.get(metro_obj, "geometry")
+        geometry:
+          Map.get(metro_obj, "geometry")
+          |> add_srid_to_geoJSON()
       }
     end
 
@@ -301,25 +305,32 @@ defmodule DriversSeatCoop.Regions do
       {center_lat, _} = Float.parse(Map.get(props, "INTPTLAT"))
       {center_lon, _} = Float.parse(Map.get(props, "INTPTLON"))
 
-      center_point = %Geo.Point{coordinates: {center_lon, center_lat}}
+      center_point = %Geo.Point{coordinates: {center_lon, center_lat}, srid: 4326}
 
       county = Regions.get_county_for_point(center_point) || %{}
 
       %{
         id: Map.get(props, "OBJECTID"),
         postal_code: Map.get(props, "BASENAME"),
-        geometry: Map.get(postal_code_obj, "geometry"),
+        geometry:
+          Map.get(postal_code_obj, "geometry")
+          |> add_srid_to_geoJSON(),
         region_id_metro_area: Regions.get_metro_area_id_for_point(center_point),
         region_id_county: Map.get(county, :id),
         region_id_state: Map.get(county, :region_id_state)
       }
     end
 
+    defp add_srid_to_geoJSON(geometry),
+      do:
+        Geo.JSON.decode!(geometry)
+        |> Map.put(:srid, 4326)
+
     defp query_tiger_db(layer_id, offset, batch_size) do
       qry_param = %{
         f: "geojson",
         outSR: 4326,
-        geometryPrecision: 500_000_000,
+        geometryPrecision: 6,
         outFields: "*",
         where: "1=1",
         resultOffset: offset,
