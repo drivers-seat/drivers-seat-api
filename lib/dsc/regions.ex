@@ -143,138 +143,176 @@ defmodule DriversSeatCoop.Regions do
     @postal_code_layer_id 84
 
     def update_states(offset \\ 0, batch_size \\ 10) do
-      result = query_tiger_db(@state_layer_id, offset, batch_size)
+      case query_tiger_db(@state_layer_id, offset, batch_size) do
+        {:ok, result} ->
+          Enum.each(result, fn state_obj ->
+            state_attr = convert_tiger_db_state_to_attrs(state_obj)
 
-      result
-      |> Enum.each(fn state_obj ->
-        props = Map.get(state_obj, "properties")
+            {:ok, _} =
+              State.sync_changeset(%State{}, state_attr)
+              |> Repo.insert(
+                on_conflict: :replace_all,
+                conflict_target: [:name]
+              )
+          end)
 
-        state_attr = %{
-          id: Map.get(props, "STATE"),
-          name: Map.get(props, "NAME"),
-          abbrv: Map.get(props, "STUSAB"),
-          geometry:
-            Map.get(state_obj, "geometry")
-            |> Map.put("srid", "4326")
-        }
+          if Enum.count(result) == batch_size do
+            case update_states(offset + batch_size, batch_size) do
+              :ok -> :ok
+              _ = error_result -> error_result
+            end
+          else
+            :ok
+          end
 
-        State.sync_changeset(%State{}, state_attr)
-        |> Repo.insert(
-          on_conflict: :replace_all,
-          conflict_target: [:name]
-        )
-      end)
+        _ = problem ->
+          problem
+      end
+    end
 
-      if Enum.count(result) == batch_size, do: update_states(offset + batch_size, batch_size)
+    defp convert_tiger_db_state_to_attrs(state_obj) do
+      props = Map.get(state_obj, "properties")
+
+      %{
+        id: Map.get(props, "STATE"),
+        name: Map.get(props, "NAME"),
+        abbrv: Map.get(props, "STUSAB"),
+        geometry:
+          Map.get(state_obj, "geometry")
+          |> Map.put("srid", "4326")
+      }
     end
 
     def update_counties(offset \\ 0, batch_size \\ 50) do
-      result = query_tiger_db(@county_layer_id, offset, batch_size)
+      case query_tiger_db(@county_layer_id, offset, batch_size) do
+        {:ok, result} ->
+          Enum.each(result, fn county_obj ->
+            county_attr = convert_tiger_db_county_to_attrs(county_obj)
 
-      result
-      |> Enum.each(fn county_obj ->
-        props = Map.get(county_obj, "properties")
+            {:ok, _} =
+              County.sync_changeset(%County{}, county_attr)
+              |> Repo.insert(
+                on_conflict: :replace_all,
+                conflict_target: [:region_id_state, :name]
+              )
+          end)
 
-        county_attr = %{
-          id: Map.get(props, "OBJECTID"),
-          region_id_state: Map.get(props, "STATE"),
-          name: Map.get(props, "NAME"),
-          geometry: Map.get(county_obj, "geometry")
-        }
+          if Enum.count(result) == batch_size do
+            case update_counties(offset + batch_size, batch_size) do
+              :ok -> :ok
+              error_result -> error_result
+            end
+          else
+            :ok
+          end
 
-        County.sync_changeset(%County{}, county_attr)
-        |> Repo.insert(
-          on_conflict: :replace_all,
-          conflict_target: [:region_id_state, :name]
-        )
-      end)
-
-      if Enum.count(result) == batch_size, do: update_counties(offset + batch_size, batch_size)
+        _ = problem ->
+          problem
+      end
     end
 
-    def update_metropolitan_areas(offset \\ 0, batch_size \\ 50) do
-      result = query_tiger_db(@metro_area_layer_id, offset, batch_size)
+    defp convert_tiger_db_county_to_attrs(county_obj) do
+      props = Map.get(county_obj, "properties")
 
-      result
-      |> Enum.each(fn metro_obj ->
-        props = Map.get(metro_obj, "properties")
-
-        metro_attr = %{
-          id: Map.get(props, "OBJECTID"),
-          name: Map.get(props, "BASENAME"),
-          full_name: Map.get(props, "NAME"),
-          geometry: Map.get(metro_obj, "geometry")
-        }
-
-        MetroArea.sync_changeset(%MetroArea{}, metro_attr)
-        |> Repo.insert(
-          on_conflict: {:replace, [:name, :full_name, :geometry]},
-          conflict_target: [:name]
-        )
-      end)
-
-      if Enum.count(result) == batch_size,
-        do: update_metropolitan_areas(offset + batch_size, batch_size)
+      %{
+        id: Map.get(props, "OBJECTID"),
+        region_id_state: Map.get(props, "STATE"),
+        name: Map.get(props, "NAME"),
+        geometry: Map.get(county_obj, "geometry")
+      }
     end
 
-    def update_micropolitan_areas(offset \\ 0, batch_size \\ 50) do
-      result = query_tiger_db(@micro_area_layer_id, offset, batch_size)
+    def update_metropolitan_areas(offset \\ 0, batch_size \\ 50),
+      do: update_metro_or_micro_areas(@metro_area_layer_id, offset, batch_size)
 
-      result
-      |> Enum.each(fn metro_obj ->
-        props = Map.get(metro_obj, "properties")
+    def update_micropolitan_areas(offset \\ 0, batch_size \\ 50),
+      do: update_metro_or_micro_areas(@micro_area_layer_id, offset, batch_size)
 
-        metro_attr = %{
-          id: Map.get(props, "OBJECTID"),
-          name: Map.get(props, "BASENAME"),
-          full_name: Map.get(props, "NAME"),
-          geometry: Map.get(metro_obj, "geometry")
-        }
+    defp update_metro_or_micro_areas(layer_id, offset, batch_size) do
+      case query_tiger_db(layer_id, offset, batch_size) do
+        {:ok, result} ->
+          Enum.each(result, fn metro_obj ->
+            metro_attr = convert_tiger_db_metro_or_micro_to_attrs(metro_obj)
 
-        MetroArea.sync_changeset(%MetroArea{}, metro_attr)
-        |> Repo.insert(
-          on_conflict: {:replace, [:name, :full_name, :geometry]},
-          conflict_target: [:name]
-        )
-      end)
+            {:ok, _} =
+              MetroArea.sync_changeset(%MetroArea{}, metro_attr)
+              |> Repo.insert(
+                on_conflict: {:replace, [:name, :full_name, :geometry]},
+                conflict_target: [:name]
+              )
+          end)
 
-      if Enum.count(result) == batch_size,
-        do: update_micropolitan_areas(offset + batch_size, batch_size)
+          if Enum.count(result) == batch_size do
+            case update_metro_or_micro_areas(layer_id, offset + batch_size, batch_size) do
+              :ok -> :ok
+              _ = error_result -> error_result
+            end
+          else
+            :ok
+          end
+
+        _ = problem ->
+          problem
+      end
+    end
+
+    defp convert_tiger_db_metro_or_micro_to_attrs(metro_obj) do
+      props = Map.get(metro_obj, "properties")
+
+      %{
+        id: Map.get(props, "OBJECTID"),
+        name: Map.get(props, "BASENAME"),
+        full_name: Map.get(props, "NAME"),
+        geometry: Map.get(metro_obj, "geometry")
+      }
     end
 
     def update_postal_codes(offset \\ 0, batch_size \\ 200) do
-      result = query_tiger_db(@postal_code_layer_id, offset, batch_size)
+      case query_tiger_db(@postal_code_layer_id, offset, batch_size) do
+        {:ok, result} ->
+          Enum.each(result, fn postal_code_obj ->
+            postal_code_attr = convert_tiger_db_postal_code_to_attrs(postal_code_obj)
 
-      result
-      |> Enum.each(fn postal_code_obj ->
-        props = Map.get(postal_code_obj, "properties")
+            {:ok, _} =
+              PostalCode.sync_changeset(%PostalCode{}, postal_code_attr)
+              |> Repo.insert(
+                on_conflict: :replace_all,
+                conflict_target: [:postal_code]
+              )
+          end)
 
-        {center_lat, _} = Float.parse(Map.get(props, "INTPTLAT"))
-        {center_lon, _} = Float.parse(Map.get(props, "INTPTLON"))
+          if Enum.count(result) == batch_size do
+            case update_postal_codes(offset + batch_size, batch_size) do
+              :ok -> :ok
+              _ = error_result -> error_result
+            end
+          else
+            :ok
+          end
 
-        center_point = %Geo.Point{coordinates: {center_lon, center_lat}}
+        _ = problem ->
+          problem
+      end
+    end
 
-        county = Regions.get_county_for_point(center_point) || %{}
+    defp convert_tiger_db_postal_code_to_attrs(postal_code_obj) do
+      props = Map.get(postal_code_obj, "properties")
 
-        postal_code_attr = %{
-          id: Map.get(props, "OBJECTID"),
-          postal_code: Map.get(props, "BASENAME"),
-          geometry: Map.get(postal_code_obj, "geometry"),
-          region_id_metro_area: Regions.get_metro_area_id_for_point(center_point),
-          region_id_county: Map.get(county, :id),
-          region_id_state: Map.get(county, :region_id_state)
-        }
+      {center_lat, _} = Float.parse(Map.get(props, "INTPTLAT"))
+      {center_lon, _} = Float.parse(Map.get(props, "INTPTLON"))
 
-        {:ok, _} =
-          PostalCode.sync_changeset(%PostalCode{}, postal_code_attr)
-          |> Repo.insert(
-            on_conflict: :replace_all,
-            conflict_target: [:postal_code]
-          )
-      end)
+      center_point = %Geo.Point{coordinates: {center_lon, center_lat}}
 
-      if Enum.count(result) == batch_size,
-        do: update_postal_codes(offset + batch_size, batch_size)
+      county = Regions.get_county_for_point(center_point) || %{}
+
+      %{
+        id: Map.get(props, "OBJECTID"),
+        postal_code: Map.get(props, "BASENAME"),
+        geometry: Map.get(postal_code_obj, "geometry"),
+        region_id_metro_area: Regions.get_metro_area_id_for_point(center_point),
+        region_id_county: Map.get(county, :id),
+        region_id_state: Map.get(county, :region_id_state)
+      }
     end
 
     defp query_tiger_db(layer_id, offset, batch_size) do
@@ -292,19 +330,44 @@ defmodule DriversSeatCoop.Regions do
       qry_param = URI.encode_query(qry_param, :rfc3986)
 
       url = "#{@tiger_url}/#{layer_id}/query?#{qry_param}"
-      Logger.warn(url)
-      {:ok, result} = http(:get, url)
-      Map.get(result, "features")
+
+      Logger.info("Querying: #{url}")
+
+      case http(:get, url) do
+        {:ok, result} ->
+          features = Map.get(result, "features")
+
+          if is_nil(features),
+            do: {:error, :no_features},
+            else: {:ok, features}
+
+        _ = problem ->
+          problem
+      end
     end
 
     defp http(method, url, body \\ [], header \\ []) do
       {:ok, response} = HTTPoison.request(method, url, body, header, recv_timeout: :infinity)
 
       case {response.status_code, response.body} do
-        {204, _} -> {:ok, nil}
-        {200, nil} -> {:ok, nil}
-        {200, body} -> {:ok, Jason.decode!(body)}
-        {_, body} -> {:error, body}
+        {204, _} ->
+          {:ok, nil}
+
+        {200, nil} ->
+          {:ok, nil}
+
+        {200, body} ->
+          body = Jason.decode!(body)
+          error = Map.get(body, "error")
+
+          if is_nil(error) do
+            {:ok, body}
+          else
+            {:error, error}
+          end
+
+        {_, body} ->
+          {:error, body}
       end
     end
   end
