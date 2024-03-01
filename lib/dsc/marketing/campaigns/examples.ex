@@ -18,9 +18,18 @@ defmodule DriversSeatCoop.Marketing.Campaigns.Examples do
     cta =
       CallToAction.new(:example_cta)
       |> CallToAction.with_content_url(
-        "https://www.youtube.com/watch?v=hsdUR2QXj1s"
+        # "https://www.youtube.com/embed/1zGlYNS2qGk"
+        # "https://www.youtube.com/watch?v=hsdUR2QXj1s"
         # "https://blog.driversseat.co/campaigns/whatsapp-community/intro-whatsapp-community"
       )
+
+    cta
+    |> CallToAction.with_header(fn %CampaignState{} = state ->
+      "Hi, #{state.user.first_name}"
+    end)
+    |> CallToAction.with_header(fn %CampaignState{} = state ->
+      "You're using an #{state.device.device_platform} device"
+    end)
 
     cta =
       CallToAction.with_header(cta, [
@@ -43,9 +52,21 @@ defmodule DriversSeatCoop.Marketing.Campaigns.Examples do
         |> CampaignAction.with_url("https://chat.whatsapp.com/XXXXXXXXXXXXXXXXXXXXXX")
       )
 
+    cta
+    |> CallToAction.with_action(CampaignAction.default_close_tool())
+
+    cta
+    |> CallToAction.with_action(CampaignAction.default_dismiss_tool())
+
+    cta
+    |> CallToAction.with_action(
+      CampaignAction.default_help_tool("Pre populate the help message with this text")
+    )
+
     cta = CallToAction.with_action(cta, CampaignAction.default_postpone_link())
     cta = CallToAction.with_action(cta, CampaignAction.default_dismiss_link())
 
+    cta = CallToAction.with_action(cta, CampaignAction.default_close_tool())
     cta = CallToAction.with_action(cta, CampaignAction.default_dismiss_tool())
     cta = CallToAction.with_action(cta, CampaignAction.default_help_tool("Help"))
 
