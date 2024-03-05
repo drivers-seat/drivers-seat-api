@@ -17,7 +17,8 @@ For campaigns that do not interrupt the user's workflow, closing the campaign re
 
 
 ### Postpone (for time)
-For campaigns that interrupt the users's workflow, posponing the campaign allows the user to return
+For campaigns that interrupt the users's workflow, posponing the campaign allows the user to focus their attention on something else and come back to this campaign at a later time.
+
 ### Help (title and subject)
 ### Custom
 ### Detail
