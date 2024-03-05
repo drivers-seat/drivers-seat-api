@@ -78,6 +78,12 @@ defmodule DriversSeatCoop.Marketing.CampaignAction do
     |> with_postpone_minutes(@one_day_minutes)
   end
 
+  def default_postpone_tool(postpone_minutes \\ @one_day_minutes) do
+    new(:default, :postpone, "X")
+    |> as_header_tool()
+    |> with_postpone_minutes(postpone_minutes)
+  end
+
   def default_dismiss_link(text \\ "No Thanks") do
     new(:default, :dismiss, text)
     |> as_link()

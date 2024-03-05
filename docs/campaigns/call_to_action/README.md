@@ -40,16 +40,15 @@ defmodule DriversSeatCoop.Marketing.Campaigns.Examples do
 end
 ```
 
-Hosted assets (like html, css, images, fonts, js) should be placed within the `/priv/static/campaigns` folder and managed as part of source control.
+Hosted assets (like html, css, images, fonts, js) are placed within the `/priv/static/campaigns` folder and managed as part of source control.
 
-* **Asset names are case sensitive** and need to match the filename of the asset.  `example_cta/example.html` is NOT the same as `example_cta/Example.html` OR `example_CTA/example.html`
+* **Asset and folder names are case sensitive** and need to match the filename of the asset.  `example_cta/example.html` is NOT the same as `example_cta/Example.html` OR `example_CTA/example.html`
 <br/>
 
 * **Consider having a common campaign.css file** and add relative references to it from within the html files for each campaign.  That will make style changes a bit easier.
 <br/>
 
-* **Consider having a folder Structure Convention** such as `/priv/static/campaigns/<<CAMPAIGN_ID>>` for the assets for each campaign.  The CTA defined above would follow this folder structure.
-<br/>
+* **Consider having a folder structure convention** such as `/priv/static/campaigns/<<CAMPAIGN_ID>>/` for the assets for each campaign.  The CTA defined above would follow this folder structure.
 
   ```text
   .
@@ -58,19 +57,22 @@ Hosted assets (like html, css, images, fonts, js) should be placed within the `/
           └── campaigns
               ├── campaigns.css
               └── example_cta
-                  ├── example_cta.html
-                  ├── example_cta.css
-                  ├── example_cta_image1.png
-                  └── example_cta_image2.png
+                  ├── example.html
+                  ├── example.css
+                  ├── example_image1.png
+                  └── example_image2.png
   ```
 
-* **Browsing to campaign assets directly** Self-hosted assets are browseable.  During development for the example above, `http://localhost:4000/web/campaigns/example_cta.html` should present the content of the CTA.
+* **Browsing to campaign assets directly** Self-hosted assets are browseable.  During development for the example above, `http://localhost:4000/web/campaigns/example_cta/example.html` should present the content of the CTA.
 <br/>
+
 * **The [endpoint.ex](/lib/dsc_web/endpoint.ex) file** is respoinsible for mapping inbound url requests to static files.
 
 ### Externally Hosted Content
 
-CTA content may also be hosted elsewhere, which may be helpful if it is managed outside of this app, or if it is large, making it difficult to manage in source control.  To access externally hosted content, use fully qualified URLs for the resources.
+CTA content may also be hosted elsewhere, which may be helpful when the content is managed outside of the app, or if the assets are large and  difficult to manage in source control.  
+
+To access externally hosted content, use fully qualified URLs for the resources.
 
 ```elixir
 defmodule DriversSeatCoop.Marketing.Campaigns.Examples do
@@ -106,6 +108,9 @@ end
 
 ## Adding Header and Footer Text (Optional)
 
+| ![header](./images/header.png)  | ![header](./images/footer.png)    |
+|--                               |--                                 |
+
 ### Single Line
 
 ```elixir
@@ -129,6 +134,7 @@ cta
 ```
 
 ### Dynamic Content
+
 A function accepting a [CampaignState](/lib/dsc/marketing/campaign_state.ex) struct may also be used.  CampaignState provides access to information about the calling user, their device, and the calling user's interaction with this campaign.
 
 ```elixir
@@ -144,58 +150,93 @@ end)
 end)
 ```
 
-## Adding Campaign Actions
+## Adding Actions
 
-Campaign Actions define how a user will interact with the campaign.
+Campaign Actions define how a user can interact with the campaign.
 
-### Toolbar Help
+### Header Actions
 
-| ![close](./images/default_help.png)  |
-|----                                           |
+#### Help button
 
-
-### Toolbar Dismiss or Close
-There are two options for closing a campaign.
-| ![close](./images/default_close_dismiss.png)  |
-|----                                           |
-
-
-#### Close
-Closing the CTA closes the screen in the UI, but the campaign is still available for the user at a later date.  Closing a CTA is often used when the user navigates to the CTA, but it does not interrupt their workflow.  For example, a user may navigate to a CTA from a preview card on their landing page.  They would go back to their landing page by closing the CTA.
-
-
-#### Dismiss
-Dismissing the CTA is the equivalent to deleting it for the user, preventing them from seeing the campaign again. Dismissing a CTA is often used for interrupt campaigns which interrupt the user's workflow.
-
-
-* **Dismiss** - Prevents the campaign from being visible to the user again.
-* **Close** - Prevents the campaign from being visible to the user again.
+| ![help button](./images/default_help.png)     | ![help](./images/help.png)    |
+|----                                           |---                            |
 
 ```elixir
-    cta
-    |> CallToAction.with_action(CampaignAction.default_close_tool())
-
-    cta
-    |> CallToAction.with_action(CampaignAction.default_dismiss_tool())
-
-    cta
-    |> CallToAction.with_action(
-      CampaignAction.default_help_tool("Pre populate the help message with this text")
-    )
-
+CallToAction.with_action(cta,
+  CampaignAction.default_help_tool("Pre populate the help message with this text")
+)
 ```
 
+#### Close button
 
+| ![close](./images/default_close_dismiss_postpone.png)   |
+|----                                                     |
 
-### Actions Buttons
-### Action Links
+A CTA may be closed in the following ways
+
+##### Close
+
+Closing a CTA closes the screen in the UI, keeping the campaign available for access in the future.  This method is used when the user takes an action that opens the CTA. For example, a user may navigate to a CTA from a preview card on their landing page.
 
 ```elixir
-cta =
-  CallToAction.with_action(cta,
-    CampaignAction.new(:join, :accept, "Join our community!")
-    |> CampaignAction.
-  )
+CallToAction.with_action(cta, CampaignAction.default_close_tool())
+```
+
+##### Dismiss
+
+Dismissing a CTA closes the screen in the UI and is the equivalent to deleting it for the user, preventing any future access.  This method is often used in conjunction with the user's workflow being interrupted by the CTA.
+
+```elixir
+CallToAction.with_action(cta, CampaignAction.default_dismiss_tool())
+```
+
+##### Postpone
+
+Postponing a CTA closes the screen in the UI and prevents the CTA from interrupting the user's workflow for a period of time, by default 24 hours.  This method allows the user to focus their attention on something else when a CTA interrupts their workflow.
+
+```elixir
+CallToAction.with_action(cta, CampaignAction.default_postpone_tool())
+```
+
+### Action Buttons
+
+| ![action_buttons](./images/action_buttons.png)  |
+|----                                             |
+
+```elixir
+cta
+|> CallToAction.with_action(
+  CampaignAction.new(:join, :accept, "Join our community!")
+  |> CampaignAction.with_url("https://chat.whatsapp.com/XXXXXXXXXXXXXXXXXXXXXX")
+)
+```
+
+* This "Accepts" the campaign with accept_action `join`
+* Accept Actions close the CTA view
+* A URL is NOT required.  Because there is a FULLY-QUALIFIED URL, an in-app browser will open and navigate to the content.
+
+```elixir
+cta
+|> CallToAction.with_action(
+  CampaignAction.new(:invite, :accept, "Invite a friend!")
+  |> CampaignAction.with_url("/marketing/referral/generate/app_invite_menu")
+)
+```
+
+* This "Accepts" the campaign with accept_action `invite`
+* Accept Actions close the CTA view
+* A URL is NOT required.  Because there is a RELATIVE URL, it will navigate within the Angular app using its router.
+
+### Action Links
+
+| ![action_links](./images/action_links.png)  |
+|----                                         |
+
+```elixir
+CallToAction.with_action(cta,
+  CampaignAction.new(:join, :accept, "Join our community!")
+  |> CampaignAction.
+)
 ```
 
 ## Associate to Categories

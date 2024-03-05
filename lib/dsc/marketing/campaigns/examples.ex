@@ -18,50 +18,60 @@ defmodule DriversSeatCoop.Marketing.Campaigns.Examples do
     cta =
       CallToAction.new(:example_cta)
       |> CallToAction.with_content_url(
-        # "https://www.youtube.com/embed/1zGlYNS2qGk"
-        # "https://www.youtube.com/watch?v=hsdUR2QXj1s"
-        # "https://blog.driversseat.co/campaigns/whatsapp-community/intro-whatsapp-community"
+        "https://blog.driversseat.co/campaigns/whatsapp-community/intro-whatsapp-community"
       )
 
-    cta
-    |> CallToAction.with_header(fn %CampaignState{} = state ->
-      "Hi, #{state.user.first_name}"
-    end)
-    |> CallToAction.with_header(fn %CampaignState{} = state ->
-      "You're using an #{state.device.device_platform} device"
-    end)
-
     cta =
-      CallToAction.with_header(cta, [
-        "Example CTA Header",
-        "more header text"
-      ])
+      cta
+      |> CallToAction.with_header(fn %CampaignState{} = state ->
+        "Hi, #{state.user.first_name}"
+      end)
+      |> CallToAction.with_header(fn %CampaignState{} = state ->
+        "You're using an #{state.device.device_platform} device"
+      end)
 
-    cta =
-      CallToAction.with_footer(cta, [
-        "Example CTA Footer",
-        "more footer text"
-      ])
+    # cta =
+    #   CallToAction.with_header(cta, [
+    #     "Example CTA Header",
+    #     "more header text"
+    #   ])
+
+    # cta =
+    #   CallToAction.with_footer(cta, [
+    #     "Example CTA Footer",
+    #     "more footer text"
+    #   ])
 
     cta = Campaign.with_category(cta, :interrupt)
 
-    cta =
-      CallToAction.with_action(
-        cta,
-        CampaignAction.new(:join, :accept, "Join our community!")
-        |> CampaignAction.with_url("https://chat.whatsapp.com/XXXXXXXXXXXXXXXXXXXXXX")
-      )
-
-    cta
-    |> CallToAction.with_action(CampaignAction.default_close_tool())
-
-    cta
-    |> CallToAction.with_action(CampaignAction.default_dismiss_tool())
-
-    cta
+    cta = cta
     |> CallToAction.with_action(
-      CampaignAction.default_help_tool("Pre populate the help message with this text")
+      CampaignAction.new(:join, :accept, "Join our community!")
+      |> CampaignAction.with_url("https://chat.whatsapp.com/XXXXXXXXXXXXXXXXXXXXXX")
     )
+    |> CallToAction.with_action(
+      CampaignAction.new(:join, :accept, "Invite a friend!")
+      |> CampaignAction.with_url("/marketing/referral/generate/app_invite_menu")
+    )
+
+    cta =
+      cta
+      |> CallToAction.with_action(CampaignAction.default_postpone_tool())
+
+
+    # cta =
+    #   cta
+    #   |> CallToAction.with_action(CampaignAction.default_close_tool())
+
+    # cta =
+    #   cta
+    #   |> CallToAction.with_action(CampaignAction.default_dismiss_tool())
+
+    cta =
+      cta
+      |> CallToAction.with_action(
+        CampaignAction.default_help_tool("Pre populate the help message with this text")
+      )
 
     cta = CallToAction.with_action(cta, CampaignAction.default_postpone_link())
     cta = CallToAction.with_action(cta, CampaignAction.default_dismiss_link())
