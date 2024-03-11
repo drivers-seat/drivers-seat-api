@@ -6,7 +6,6 @@ Campaign Actions define how a user may interact with a campaign and what happens
 * [Layout of Actions](#layout)
 * [Redirecting users to a URL after an action](#adding-a-url-to-an-action)
 * [Add custom code to actions using Action Hooks](#action-hooks)
-* [Surfacing actions on campaigns](#adding-actions-to-campaigns)
 
 ## Action Types
 
@@ -67,7 +66,8 @@ CampaignAction.new(:request_close, :close, "Close Me")
 
 A campaign may allow the user to submit a customized help request with a prepopulated message.
 
-/// SHOW HELP INTERACTION HERE ///
+| ![help icon](./images/default_help.png)  | ![help view](./images/help.png) |
+|---                              |--                      |
 
 * Opens a new help request dialog window
 * Requesting help DOES NOT close the underlying campaign view
@@ -87,7 +87,8 @@ CTAs and Surveys can be surfaced as a preview card on the landing page.  The Det
 * Opens the full-screen version of the campaign.
 * Does NOT update database table `campaign_participants`.
 
-///SHOW CAMPAIGN CARD HERE///
+| ![card](./images/preview_card.png)    | ![detail](./images/preview_detail.png)  |
+|--                                 |--                                 |
 
 ### Logout
 
@@ -102,7 +103,7 @@ Presents a button allowing the user to navigate to the previous or next page of 
 * Only works on survey campaigns
 * Updates database table `campaign_participants`, setting the `section` property of the `additional_data` column.
 
-  ```json
+  ```js
   {
     "section": "page_1",     // This is the last known page/section that the user was on
     "data": {
@@ -135,14 +136,12 @@ By default, actions are presented as buttons.  The type of action may affect the
 |![buttons](./images/action_buttons.png)  |
 |---                                      |
 
-
 ### As a Footer Link
 
 An action may be converted to a link displayed in the footer of the campaign or preview card by declaring it with the `as_link` function.
 
 |![links](./images/action_links.png)  |
 |---                                  |
-
 
 ```elixir
 CampaignAction.new(:no_thanks, :dismiss, "No Thanks!")
@@ -229,7 +228,7 @@ Here's the action hook implementing the user's request for download.
 ```elixir
 campaign
 |> Campaign.on_custom_action(fn %CampaignState{} = state, action ->
-  if action == "download_data}",
+  if action == "download_data",
     do: UserRequest.export_all(state.user.id)
 
   # return the CampaignParticipant unchanged.
@@ -246,7 +245,4 @@ end)
 | Custom, Help, Close           | `Campaign.on_custom_action(campaign, fn %CampaignState{} state, action_code -> ... end)`  |
 | Postpone                      | `Campaign.on_dismiss(campaign, fn %CampaignState{} state, action_code, postpone_minutes -> ... end)`        |
 | Present                       | `Campaign.on_dismiss(campaign, fn %CampaignState{} state -> ... end)`                     |
-| Logout, Detail, Next, Prev    | action hooks are not supported
-
-## Adding Actions to Campaigns
-
+| Logout, Detail, Next, Prev    | action hooks are not supported |

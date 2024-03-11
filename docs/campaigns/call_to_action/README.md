@@ -2,11 +2,7 @@
 
 A call to action presents information to the user a a single view of hosted web content.  Users may respond to the CTA using various actions.  CTAs are considered one-way communication.
 
-<div style="text-align:center;">
-
 ![Call To Action (CTA)](./images/CTA_components.png)
-
-</div>
 
 * [Declaring a CTA](#declaring-the-cta-required) - required
 * [Identify Hosted Content](#identifying-the-content-required) - required
@@ -181,26 +177,40 @@ end)
 
 [Campaign Actions](../campaign_actions/README.md) define how a user may interact with the campaign.
 
-Adding a single action
+Add an accept action presented as a button button
 
 ```elixir
 cta
-# add accept button
 |> CallToAction.with_action(
   CampaignAction.new(:add_goals, :accept, "Let's Get Started")
 )
-# add a postpone link
+```
+
+Add a postpone (for 90 minutes) action as a link
+
+```elixir
+cta
 |> CallToAction.with_action(
   CampaignAction.new(:remind_later, :postpone, "Maybe Later")
   |> CampaignAction.with_postpone_minutes(90)
   |> CampaignAction.as_link()
 )
-# add a dismiss link
+```
+
+Add a dismiss action presented as a Link
+
+```elixir
+cta
 |> CallToAction.with_action(
   CampaignAction.new(:no_thanks, :dismiss, "No Thanks")
   |> CampaignAction.as_link()
 )
-# add a help link to the footer of the CTA
+```
+
+Add a help action as a link
+
+```elixir
+cta
 |> CallToAction.with_action(
   CampaignAction.new(:question, :help, "I have a question")
   |> CampaignAction.with_data(%{
@@ -212,4 +222,44 @@ cta
 
 ### Adding actions conditionally
 
+Add an action conditionally to a CTA by supplying a function that, given `%CampaignState{}` evaluates to TRUE or FALSE
+
+This example only allows the user to pospone a campaign once.  If the user has NOT previously dismissed the campaign, add the postpone action.
+
+```elixir
+cta
+|> CallToAction.with_conditional_action(
+  # function returning t/f
+  fn %CampaignState{} = state ->
+    is_nil(state.participant.postponed_until)
+  end,
+  # action or actions if true
+  CampaignAction.new(:remind_later, :postpone, "Maybe Later")
+  |> CampaignAction.with_postpone_minutes(90)
+  |> CampaignAction.as_link()
+)
+```
+
 ### Adding actions dynamically
+
+Add actions dynamically to a CTA by supplying a function that, given `%CampaignState{}` returns a list of `%CampaignAction{}`.
+
+
+This example only allows the go to blog action (as button) if the user's account is at least 5 days old.
+
+```elixir
+cta
+|> CallToAction.with_action(fn %CampaignState{} = state ->
+  account_age_seconds = NaiveDateTime.diff(NaiveDateTime.utc_now(), state.user.inserted_at)
+
+  if account_age_seconds >= 432_000 do
+    CampaignAction.new(:blog, :custom, [
+      "Get the lastest Driver News",
+      "Check out the Driver's Seat Blog"
+    ])
+    |> CampaignAction.with_url("https://blog.driversseat.co")
+  else
+    []
+  end
+end)
+```
