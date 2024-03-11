@@ -8,7 +8,7 @@ Campaigns support the presentation and interaction of dynamic content in the mob
 
 ## Types of Campaigns
 
-### Calls to Action (CTAs)
+### [Calls to Action (CTAs)](./call_to_action/README.md)
 
 A call to action presents information to the user a a single view of hosted web content.  Users may be presented various actions.
 
@@ -17,16 +17,16 @@ A call to action presents information to the user a a single view of hosted web 
 
 ### Surveys
 
-A survey is an interactive workflow divided into one or many pages (sections).  Each section presents and (usually) collects information from the user.  Information collected from the user is stored in the database.
+A survey is an interactive workflow divided into one or many pages (known as sections).  Each section presents and can/usually collects information from the user.  Information collected from the user is stored in the `additiona_info` column of table `campaign_participants`.
 
-  |![1](./surveys/images/example_1.png)  |![2](./surveys/images/example_2.png)  |![3](./surveys/images/example_3.png)
-  |-- |-- |--
+  |![1](./surveys/images/example_1.png)  |![2](./surveys/images/example_2.png)  |![3](./surveys/images/example_3.png)|
+  |-- |-- |--|
   
 ### Checklists
 
 A checklist is a list of tasks/items with status information.  Unlike surveys and CTAs, checklists appear as cards that are embedded within other application pages.
 
-  |![1](./checklists/images/example_landing_page.png)  |![2](./checklists/images//example_checklist.png)  |
+  |![1](./checklists/images/example_landing_page.png)  |![2](./checklists/images/example_checklist.png)  |
   |-- |--
   
 
