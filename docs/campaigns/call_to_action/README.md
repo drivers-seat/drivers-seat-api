@@ -12,6 +12,8 @@ A call to action presents information to the user a a single view of hosted web 
 
 ## Declaring the CTA (Required)
 
+Declare the CTA
+
 ```elixir
 defmodule DriversSeatCoop.Marketing.Campaigns.Examples do
   
