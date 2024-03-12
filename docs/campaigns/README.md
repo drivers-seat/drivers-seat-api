@@ -1,23 +1,21 @@
 # Campaigns
 
-Campaigns support the presentation and interaction of dynamic content in the mobile app.  Because they are defined in the API layer (in code), campaigns:
+Campaigns support the presentation and interaction of dynamic content in the mobile app.  Defined in the API layer (in code), campaigns may be tailored for the calling user and/or device being used; released and/or modified without the need for a mobile app release.
 
-* May be tailored for the calling user and/or device being used.
-* May be released and/or modified without the need for a mobile app release.
-* Take affect immediately
-
-___
-
-* [Campaign Types](#types-of-campaigns)
-* [Qualifying Criteria/Audience Filtering](#qualifying-criteria-for-a-campaign)
-* [Campaign Categories](#adding-categories-to-a-campaign)
+* [Define a Campaign](#defining-a-campaign)
+* [Determine the Audience using Qualifying Criteria](#qualifying-criteria-for-a-campaign)
+* [Determine how the campaign is surfaced using Campaign Categories](#adding-categories-to-a-campaign)
+* [Add a Campaign Card (Surveys and CTAs only)](#creating-a-campaign-card)
+* [Enable the Campaign](#enable-the-campaign)
 
 
-## Types of Campaigns
+## Defining a Campaign
 
-* [Call To Action](#calls-to-action-ctas)
-* [Surveys](#surveys)
-* [Checklists](#checklists)
+There are 3 campaign types.
+
+* [Call To Action (CTA)](#calls-to-action-ctas)
+* [Survey](#surveys)
+* [Checklist](#checklists)
 
 ### [Calls to Action (CTAs)](./call_to_action/README.md)
 
@@ -33,7 +31,7 @@ A survey is an interactive workflow divided into one or many pages (known as sec
   |![1](./surveys/images/example_1.png)  |![2](./surveys/images/example_2.png)  |![3](./surveys/images/example_3.png)|
   |-- |-- |--|
   
-### Checklists
+### [Checklists](./checklists/README.md)
 
 A checklist is a list of tasks/items with status information.  Unlike surveys and CTAs, checklists appear as cards that are embedded within other application pages.
 
@@ -42,9 +40,12 @@ A checklist is a list of tasks/items with status information.  Unlike surveys an
   
 ## Qualifying Criteria for a Campaign
 
-Qualifying criteria allows the filtering of campaigns for specific users, devices, and or conditions.  
+Qualifying criteria allows the filtering of campaigns for specific users, devices, and or conditions.
 
-### Caller App Version
+* If a campaign has been [dismissed](./campaign_actions/README.md#dismiss), it is always excluded.
+* If there is no other qualification critera, the campaign qualifies for all users.
+
+### Qualify for specific App Version(s)
 
 Filter campaigns based on the version of the mobile app making the call.
 
@@ -60,11 +61,11 @@ CallToAction.new(:upgrade_for_better_mileage_tracking)
 |> Campaign.exclude_app_version(">= 4.0.0")
 ```
 
-### Custom Criteria using a function
+### Qualify based on Custom Criteria using a function
 
 Provide a function that accepts a [CampaignState](../../lib/dsc/marketing/campaign_state.ex) struct and returns TRUE if the caller should have access to the campaign.
 
-Example: This survey will become available 5-days after the user has created their account if they have not successfully set up a gig-account.
+This survey will become available 5-days after the user has created their account if they have not successfully set up a gig-account.
 
 ```elixir
 defmodule DriversSeatCoop.Marketing.Campaigns.Examples do
@@ -106,16 +107,15 @@ CallToAction.new(:upgrade_for_better_mileage_tracking)
 ])
 ```
 
+### Adding Categories Dynamically
+
 Categorization can also be dynamic.  Provide a function that accepts a [CampaignState](../../lib/dsc/marketing/campaign_state.ex) struct and returns one or many categories.
 
 
+This campaign is initially presented in full-screen mode (because of the `:interrupt` category). If the user accepts the campaign, it will also add a preview card to their dashboard (because of the `:dashboard_info` category).
 
 ```elixir
-# This campaign is presented in full-screen mode (because of the :interrupt category).  
-# If the user accepts the campaign, it will also add a preview card to their dashboard
-# as well (because of the :dashboard_info category)
-
-CallToAction.new(:upgrade_for_better_mileage_tracking)
+CallToAction.new(:connect_with_other_drivers_whatsapp)
 |> Campaign.with_category(fn %CampaignState{} = state ->
 
   result = [:interupt]
@@ -123,16 +123,39 @@ CallToAction.new(:upgrade_for_better_mileage_tracking)
   if is_nil(state.participant.accepted_on),
     do: result ++ [:dashboard_info],
     else: result
-
 end)
-
 ```
 
+### The `:interrupt` Category
 
-### `:interrupt` Category
-
-Campaigns that are categorized as `:interrupt` will interrupt the user's workflow when ALL of the following conditions are met
+Campaigns that are categorized as `:interrupt` will interrupt the user's workflow when ALL of the following conditions are met.
 
 * User meets the [qualification criteria](#qualifying-criteria-for-a-campaign).
-* User has not [accepted](./campaign_actions/README.md/#accept) or [dismissed](./campaign_actions/README.md/#dismiss) the campaign.
-* Campaign is not currently [postponed](./campaign_actions/README.md/#postpone-for-duration) for the user.
+* User has not [accepted](./campaign_actions/README.md#accept) or [dismissed](./campaign_actions/README.md#dismiss) the campaign.
+* Campaign is not currently [postponed](./campaign_actions/README.md#postpone-for-duration) for the user.
+
+If multiple campaigns meet these criteria, they will be presented one at a time, in the order in which they have been [enabled](#enable-the-campaign).
+
+
+## Creating a Campaign Card
+
+
+
+## Enable the Campaign
+
+Add the campaign to the active campaigns in [marketing.ex](../../../lib/dsc/marketing.ex).  [Interrupt](#the-interrupt-category) campaigns should be added in the order it which they are to be presented.
+
+```elixir
+defmodule DriversSeatCoop.Marketing do
+  alias DriversSeatCoop.Marketing.Campaigns.Examples
+  alias DriversSeatCoop.Marketing.Campaigns.GoalsSurvey
+  alias DriversSeatCoop.Marketing.Campaigns.MileageTrackingIntroSurvey
+
+  def get_active_campaigns do
+    [
+      Examples.cta(),                             # this is the new CTA
+      GoalsSurvey.instance(),
+      MileageTrackingIntroSurvey.instance()
+    ]
+  end
+```
