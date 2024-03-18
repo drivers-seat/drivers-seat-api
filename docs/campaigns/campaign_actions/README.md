@@ -5,6 +5,7 @@ Campaign Actions define how a user may interact with a campaign and what happens
 * [Types of Actions](#action-types)
 * [Layout of Actions](#layout)
 * [Redirecting users to a URL after an action](#adding-a-url-to-an-action)
+* [Adding a delay between campaigns](#adding-a-delay-between-interrupt-campaigns)
 * [Add custom code to actions using Action Hooks](#action-hooks)
 
 ## Action Types
@@ -205,6 +206,23 @@ CampaignAction.new(:learn_more_transition, :custom, [
 |> CampaignAction.with_url("https://www.driversseat.co")
 ```
 
+## Adding a delay between `:interrupt` campaigns
+
+When a user [is qualified](../README.md#qualifying-criteria-for-a-campaign) to receive multiple [interrupt campaigns](../README.md#the-interrupt-category-for-ctas-and-surveys), they are queued in the order that they [are declared](../README.md#enable-the-campaign).  At times, this can be problematic because:
+
+* It may inundate the user, especially a new user.
+* If a campaign directs the user to perform a task, it is helpful to give the user time to perform the task before the next campaign interrupts their workflow again.
+
+To help alleviate this, a delay may be added to a campaign action.  This signals the UI to delay presenting any additional interrupt campaigns for a certain amount of time.
+
+```elixir
+CampaignAction.new(:no_thanks, :dismiss, "No Thanks")
+|> CampaignAction.with_reengage_delay(600)       # Adds a 10-minute delay
+```
+
+* This delay is enforced only in the mobile app.  If the user restarts the app, the delay will not be enforced.
+* Mobile app developer may [pause interrupt campaigns](https://github.com/drivers-seat/drivers-seat-mobile/blob/fe731bd806c8c661af115e5cbc8f06ee2aa4a504/src/app/services/marketing/marketing.service.ts#L155) for critical code sections.  For example, while the user is editing their profile.
+
 ## Action Hooks
 
 Action hooks support the execution of custom back-end functions when a user performs an action.
@@ -214,27 +232,31 @@ Action hooks support the execution of custom back-end functions when a user perf
 * Action hook functions may manipulate the [`%CampaignParticipant{}`](../../../lib/dsc/marketing/campaign_participant.ex) and return it for the next function.
 * There may be multiple functions attached to a campaign action.  They are executed in the order that they were declared, passing an updated [`%CampaignState{}`](../../../lib/dsc/marketing/campaign_state.ex).
 
-Here is an example action that allows the user to request a copy of their data
+**Examples:**
 
-```elixir
-CampaignAction.new(:download_data, :custom, [
-  "Download a copy of your data",
-  "for your records"
-])
-```
+* Action allowing the user to request a copy of their data
 
-Here's the action hook implementing the user's request for download.
+  ```elixir
+  CampaignAction.new(:download_data, :custom, [
+    "Download a copy of your data",
+    "for your records"
+  ])
+  ```
 
-```elixir
-campaign
-|> Campaign.on_custom_action(fn %CampaignState{} = state, action ->
-  if action == "download_data",
-    do: UserRequest.export_all(state.user.id)
+  Here's the action hook implementing the user's request for download.
 
-  # return the CampaignParticipant unchanged.
-  state.participant
-end)
-```
+  ```elixir
+  campaign
+  |> Campaign.on_custom_action(fn %CampaignState{} = state, action ->
+    if action == "download_data",
+      do: UserRequest.export_all(state.user.id)
+
+    # return the CampaignParticipant unchanged.
+    state.participant
+  end)
+  ```
+
+* A more complex example that [translates a user's goal survey responses into earnings goals](../../../lib/dsc/marketing/campaigns/goals_survey.ex#L41)
 
 ### Action Hook Function Signatures
 

@@ -7,7 +7,7 @@ Campaigns support the presentation and interaction of dynamic content in the mob
 * [Determine how the campaign is surfaced using Campaign Categories](#adding-categories-to-a-campaign)
 * [Add a Campaign Card (Surveys and CTAs only)](#creating-a-campaign-card)
 * [Enable the Campaign](#enable-the-campaign)
-
+* [Track Campaign Results](#track-campaign-results)
 
 ## Defining a Campaign
 
@@ -94,7 +94,6 @@ defmodule DriversSeatCoop.Marketing.Campaigns.Examples do
 end
 ```
 
-
 ## Adding Categories to a Campaign
 
 Campaigns can be assigned one or many categories which determines where they will be surfaced in the application.
@@ -111,7 +110,6 @@ CallToAction.new(:upgrade_for_better_mileage_tracking)
 
 Categorization can also be dynamic.  Provide a function that accepts a [CampaignState](../../lib/dsc/marketing/campaign_state.ex) struct and returns one or many categories.
 
-
 This campaign is initially presented in full-screen mode (because of the `:interrupt` category). If the user accepts the campaign, it will also add a preview card to their dashboard (because of the `:dashboard_info` category).
 
 ```elixir
@@ -126,9 +124,9 @@ CallToAction.new(:connect_with_other_drivers_whatsapp)
 end)
 ```
 
-### The `:interrupt` Category
+### The `:interrupt` Category for CTAs and Surveys
 
-Campaigns that are categorized as `:interrupt` will interrupt the user's workflow when ALL of the following conditions are met.
+CTAs and Surveys that are categorized as `:interrupt` will interrupt the user's workflow when ALL of the following conditions are met.
 
 * User meets the [qualification criteria](#qualifying-criteria-for-a-campaign).
 * User has not [accepted](./campaign_actions/README.md#accept) or [dismissed](./campaign_actions/README.md#dismiss) the campaign.
@@ -136,10 +134,29 @@ Campaigns that are categorized as `:interrupt` will interrupt the user's workflo
 
 If multiple campaigns meet these criteria, they will be presented one at a time, in the order in which they have been [enabled](#enable-the-campaign).
 
+## [Creating a Campaign Card](./campaign_cards/README.md)
 
-## Creating a Campaign Card
+CTAs and Surveys can have a preview card that is displayed on the dashboard and/or custom page.
 
+```elixir
+@campaign_id :connect_with_other_drivers_whatsapp
 
+CallToAction.new(@campaign_id)
+|> Campaign.with_category(:dashboard_info)
+|> Campaign.with_preview(
+  CampaignPreview.new()
+  |> CampaignPreview.with_title("Connect with Other Gig Workers")
+  |> CampaignPreview.with_left_image_url("#{@campaign_id}/preview.png")
+  |> CampaignPreview.with_action([
+    CampaignAction.default_dismiss_tool(),
+    CampaignAction.default_help_tool("I need help joining the Driver's Seat Community"),
+    CampaignAction.new(:accept_preview, :accept, "Join our Community!")
+    |> CampaignAction.with_url(@whatsapp_invite_url)
+  ])
+)
+```
+
+Find out nore about how to implement a [campaign preview card](../campaigns/campaign_cards/README.md).
 
 ## Enable the Campaign
 
@@ -159,3 +176,12 @@ defmodule DriversSeatCoop.Marketing do
     ]
   end
 ```
+
+## Track Campaign Results
+
+There are two ways to track campaign results
+
+* Database table `CampaignParticipant` contains information about when a campaign was first/last viewed (full screen), when and how (action) it was accepted, when and how (action) it was dismissed, and/or when and how (action) it was last posponed.
+* Mixpanel receives events in the form of `campaign/${campaign_id}/${event_type}`.  For example `campaign/connect_with_other_drivers_whatsapp/accept`
+  * Within the event data is the `action` which represents the [Campaign Action](./campaign_actions/README.md) that caused the event to be tracked.
+  * For Surveys, the form data is captued in event properties based using `field_id`.

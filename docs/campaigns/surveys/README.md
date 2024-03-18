@@ -5,6 +5,12 @@ Surveys are campaigns that present and collect information from users.  They are
 |![1](images/example_1.png) | ![2](images/example_2.png)  | ![3](images/example_3.png)  |
 |--                         |--                           |--                           |
 
+* [Declaring the Survey](#declaring-a-survey) - required
+* Adding [Content Sections](#adding-a-content-section) or [Form Sections](#adding-a-form-section) - required
+* [Showing/Hiding Pagination Controls](#page-markers-and-navigation-arrows)
+* [Adding Section Actions](#section-actions)
+* [Campaign State for Surveys](#campaign-state-for-survey-data)
+
 ## Declaring a Survey
 
 Declare the Survey
@@ -446,6 +452,16 @@ section
 )
 ```
 
+Add a dismiss action presented as header tool close button.
+
+```elixir
+section
+|> SurveySection.with_action(
+  CampaignAction.new(:no_thanks, :dismiss, "X")
+  |> CampaignAction.as_header_tool()
+)
+```
+
 Add a help action as a link
 
 ```elixir
@@ -456,6 +472,19 @@ section
     message_text: "[ Tell us how we can help you with this campaign ]"
   })
   |> CampaignAction.as_link()
+)
+```
+
+Add a help action as a header tool help icon.
+
+```elixir
+section
+|> SurveySection.with_action(
+  CampaignAction.new(:question, :help, "I have a question")
+  |> CampaignAction.with_data(%{
+    message_text: "[ Tell us how we can help you with this campaign ]"
+  })
+  |> CampaignAction.as_header_tool()
 )
 ```
 
@@ -492,7 +521,6 @@ section
 ### Adding actions dynamically
 
 Add actions dynamically to a Survey Section by supplying a function that, given `%CampaignState{}` returns a list of `%CampaignAction{}`.
-
 
 This example only allows the go to blog action (as button) if the user's account is at least 5 days old.
 

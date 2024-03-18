@@ -26,12 +26,14 @@ defmodule DriversSeatCoop.Marketing do
 
   def get_active_campaigns do
     [
-      Examples.cta()
-
-      # OnboardingChecklist.instance(),
+      # Examples.survey(),
+      Examples.cta(),
+      # Examples.checklist()
+      OnboardingChecklist.instance()
       # GoalsSurvey.instance(),
       # MileageTrackingIntroSurvey.instance()
-    ]
+    ] ++ Examples.previews()
+    ++ Examples.custom_page()
   end
 
   def get_available_campaigns_for_user(

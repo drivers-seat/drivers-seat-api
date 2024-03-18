@@ -179,7 +179,7 @@ end)
 
 [Campaign Actions](../campaign_actions/README.md) define how a user may interact with the campaign.
 
-Add an accept action presented as a button button
+Add an accept action presented as a button.
 
 ```elixir
 cta
@@ -188,7 +188,7 @@ cta
 )
 ```
 
-Add a postpone (for 90 minutes) action as a link
+Add a postpone (for 90 minutes) action as a link.
 
 ```elixir
 cta
@@ -199,7 +199,7 @@ cta
 )
 ```
 
-Add a dismiss action presented as a Link
+Add a dismiss action presented as a Link.
 
 ```elixir
 cta
@@ -209,7 +209,17 @@ cta
 )
 ```
 
-Add a help action as a link
+Add a dismiss action presented as header tool close button.
+
+```elixir
+cta
+|> CallToAction.with_action(
+  CampaignAction.new(:no_thanks, :dismiss, "X")
+  |> CampaignAction.as_header_tool()
+)
+```
+
+Add a help action as a link.
 
 ```elixir
 cta
@@ -219,6 +229,19 @@ cta
     message_text: "[ Tell us how we can help you with this campaign ]"
   })
   |> CampaignAction.as_link()
+)
+```
+
+Add a help action as a header tool help icon.
+
+```elixir
+cta
+|> CallToAction.with_action(
+  CampaignAction.new(:question, :help, "I have a question")
+  |> CampaignAction.with_data(%{
+    message_text: "[ Tell us how we can help you with this campaign ]"
+  })
+  |> CampaignAction.as_header_tool()
 )
 ```
 
