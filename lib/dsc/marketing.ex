@@ -2,7 +2,6 @@ defmodule DriversSeatCoop.Marketing do
   alias DriversSeatCoop.Accounts.User
   alias DriversSeatCoop.Devices.Device
   alias DriversSeatCoop.Marketing.CampaignParticipant
-  alias DriversSeatCoop.Marketing.Campaigns.Examples
   alias DriversSeatCoop.Marketing.Campaigns.GoalsSurvey
   alias DriversSeatCoop.Marketing.Campaigns.MileageTrackingIntroSurvey
   alias DriversSeatCoop.Marketing.Campaigns.OnboardingChecklist
@@ -26,14 +25,10 @@ defmodule DriversSeatCoop.Marketing do
 
   def get_active_campaigns do
     [
-      # Examples.survey(),
-      Examples.cta(),
-      # Examples.checklist()
-      OnboardingChecklist.instance()
-      # GoalsSurvey.instance(),
-      # MileageTrackingIntroSurvey.instance()
-    ] ++ Examples.previews()
-    ++ Examples.custom_page()
+      OnboardingChecklist.instance(),
+      GoalsSurvey.instance(),
+      MileageTrackingIntroSurvey.instance()
+    ]
   end
 
   def get_available_campaigns_for_user(

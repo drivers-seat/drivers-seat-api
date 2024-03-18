@@ -10,24 +10,39 @@ defmodule DriversSeatCoop.AppPreferences do
         user_id: user_id,
         value: %{
           sections: [
-            # Any alerts to show here
             %{
-              id: :alerts,
+              id: :transition,
               type: :campaign,
               header: nil,
               display_class: [
-                :dashboard_notifications
+                :dashboard_toDos
               ],
-              orientation: :vertical,
+              orientation: :horizontal,
               campaign_category: [
-                :alerts
+                :transition
               ],
               show_empty: false,
               empty_template: nil
             },
-
-            # To-dos, only visible if there are active To Dos.  
-            # Checklist is categorized based on if its complete
+            # Top recommendations, visible only if there are new recommendations
+            # This is handled by the UI
+            %{
+              id: :recommendations_top,
+              type: :campaign,
+              header: nil,
+              display_class: [
+                :dashboard_recommendations
+              ],
+              orientation: :horizontal,
+              campaign_category: [
+                :recommendations,
+                :recommendations_accepted
+              ],
+              show_empty: true,
+              # handled by custom code in the UI
+              empty_template: nil
+            },
+            # Top todos, only visible if there are active To Dos.  Checklist is categorized based on if its complete
             %{
               id: :to_dos,
               type: :campaign,
@@ -56,87 +71,29 @@ defmodule DriversSeatCoop.AppPreferences do
               display_class: [
                 :dashboard_info
               ],
-              orientation: :horizontal,
+              orientation: :vertical,
               campaign_category: [
                 :info
               ],
               show_empty: false,
               empty_template: nil
-            }
-          ]
-        }
-      },
-      %UserAppPreference{
-        key: :example_custom_page,
-        user_id: user_id,
-        value: %{
-          title: ["Custom Page Example"],
-          description: ["Look at this custom page of campaign cards"],
-          sections: [
-            # Any alerts to show here
-            %{
-              id: :top,
-              type: :campaign,
-              display_class: [
-                :dashboard_info
-              ],
-              orientation: :vertical,
-              campaign_category: [
-                :custom_top
-              ],
-              show_empty: false,
-              empty_template: nil
             },
+            # Bottom recommendations only appear if there are accepted recommendations
+            # and there are no new recommendations.  This is handled by the UI
             %{
-              id: :horiz_1,
+              id: :recommendations_bottom,
               type: :campaign,
-              slides_per_row: 3,
-              header: %{
-                title: ["3 Horizontal Card Header"],
-                description: [
-                  "Look at me, I'm 3-horiztonal cards in a row",
-                ]
-              },
-              footer: %{
-                title: ["3 Horizontal Card Footer"],
-                description: [
-                  "Thanks",
-                ]
-              },
+              header: nil,
               display_class: [
-                :dashboard_info
+                :dashboard_recommendations
               ],
               orientation: :horizontal,
               campaign_category: [
-                :custom_horizontal_1
+                :recommendations,
+                :recommendations_accepted
               ],
-              show_empty: false,
-              empty_template: nil
-            },
-            %{
-              id: :horiz_2,
-              type: :campaign,
-              display_class: [
-                :dashboard_info
-              ],
-              orientation: :horizontal,
-              campaign_category: [
-                :custom_horizontal_2
-              ],
-              show_empty: false,
-              empty_template: nil
-            },
-            %{
-              id: :vert_2,
-              type: :campaign,
-              display_class: [
-                :dashboard_info
-              ],
-              orientation: :vertical,
-              campaign_category: [
-                :custom_vertical_2
-              ],
-              show_empty: false,
+              show_empty: true,
+              # handled by custom code in the UI
               empty_template: nil
             }
           ]
