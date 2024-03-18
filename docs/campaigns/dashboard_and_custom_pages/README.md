@@ -69,7 +69,7 @@ A user can be navigated to the custom page via a [Campaign Action](../campaign_a
 
 ```elixir
 CallToAction.new(:community)
-|> Campaign.with_category(:info)        # appears on dashboard/landing page
+|> Campaign.with_category(:info)                                            # appears on dashboard/landing page
 |> Campaign.with_preview(
   CampaignPreview.new()
   |> CampaignPreview.with_left_image_url("#{@example_preview}/preview.png")

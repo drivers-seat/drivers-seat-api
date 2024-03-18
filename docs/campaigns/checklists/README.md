@@ -184,4 +184,3 @@ checklist
   |> CampaignAction.as_header_tool()
 )
 ```
-

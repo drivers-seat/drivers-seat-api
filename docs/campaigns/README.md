@@ -136,7 +136,9 @@ If multiple campaigns meet these criteria, they will be presented one at a time,
 
 ## [Creating a Campaign Card](./campaign_cards/README.md)
 
-CTAs and Surveys can have a preview card that is displayed on the dashboard and/or custom page.
+![](./campaign_cards/images/card_layout_left_image_and_text.png)
+
+CTAs and Surveys can have a [preview card](./campaign_cards/README.md) that is displayed on the dashboard and/or custom page.
 
 ```elixir
 @campaign_id :connect_with_other_drivers_whatsapp

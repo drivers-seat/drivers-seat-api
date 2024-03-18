@@ -177,7 +177,7 @@ end)
 
 ## Adding Actions
 
-[Campaign Actions](../campaign_actions/README.md) define how a user may interact with the campaign.
+[Campaign Actions](../campaign_actions/README.md) define how a user may interact with the campaign.  Here are some examples, see [Campaign Actions](../campaign_actions/README.md) for more in-depth information.
 
 Add an accept action presented as a button.
 

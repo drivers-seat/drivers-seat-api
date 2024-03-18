@@ -32,7 +32,7 @@ end
 
 ## Adding a Content Section
 
-A content section presents external content for the page.  It is very similiar to [creating a Call To Action (Survey Section)](../call_to_action/README.md#identifying-the-content-required).
+A content section presents external content for the page.  It is very similiar to [creating a Call To Action](../call_to_action/README.md#identifying-the-content-required) except that it represents a single/section of the survey.
 
 ```elixir
 defmodule DriversSeatCoop.Marketing.Campaigns.Examples do
@@ -75,11 +75,9 @@ Survey.new(@example_survey)
 )
 ```
 
-
 #### Informational
 
 Add descriptive information to the user using an informational item.
-
 
 | ![info](./images/survey_item_info.png)              | 
 |--                                                   |
@@ -353,7 +351,7 @@ section
 ])
 ```
 
-* If an item is no longer visible because of a dependency, its value is not validated.
+* If an item is no longer visible because of a dependency, its value is not validated and it is not saved.
 * The dependancy can be based on an item in a different section.
 
 ### Data Validations
@@ -540,5 +538,3 @@ section
   end
 end)
 ```
-
-## Campaign State for Survey Data

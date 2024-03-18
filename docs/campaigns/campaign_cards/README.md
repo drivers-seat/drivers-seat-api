@@ -1,8 +1,9 @@
-# Campaign Cards
+# Campaign (Preview) Cards
 
 Survey and Call-to-Action (CTA) Campaigns may have a campaign card associated to them.  This allows a "preview" display to be presented on the dashboard or a custom page in the app.
 
 ## Declaring a Campaign Card
+
 ```elixir
 
 card = CampaignPreview.new()
