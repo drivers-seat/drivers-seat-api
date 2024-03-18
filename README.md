@@ -2,8 +2,7 @@
 
 Related Projects:
 
-- [Mobile Application](https://github.com)
-
+- [Mobile Application](https://github.com/drivers-seat/drivers-seat-mobile)
 
 The API server:
 
@@ -21,20 +20,21 @@ This project uses:
 - [Phoenix](https://www.phoenixframework.org) as the web framework
 - [Oban](https://getoban.pro) for background job processing
 
-
-
 ## External Services
-This project uses:
-* [Backblaze (B2)](https://www.backblaze.com/)
-* [Argyle](https://argyle.com)
-* [Papertrail](https://www.papertrail.com/) via Heroku add-on
-* [Mixpanel](https://mixpanel.com/)
-* [SendGrid](https://sendgrid.com/en-us/solutions/email-api) via Heroku add-on
-* [Sentry](https://sentry.io/welcome/)
-* [OneSignal](https://onesignal.com/)
 
+This project uses:
+
+- [Backblaze (B2)](https://www.backblaze.com/)
+- [Argyle](https://argyle.com)
+- [Papertrail](https://www.papertrail.com/) via Heroku add-on
+- [Mixpanel](https://mixpanel.com/)
+- [SendGrid](https://sendgrid.com/en-us/solutions/email-api) via Heroku add-on
+- [Sentry](https://sentry.io/welcome/)
+- [OneSignal](https://onesignal.com/)
 
 ## Getting Started
-* [Setting-up a Development Environment](/docs/developer_setup/README.md)
-* [Environment Variables](/docs/environment_variables/README.md)
-* [Populating Geosptial Referece Data](/docs/populating_geographies/README.md)
+
+- [Setting-up a Development Environment](/docs/developer_setup/README.md)
+- [Environment Variables](/docs/environment_variables/README.md)
+- [Populating Geosptial Referece Data](/docs/populating_geographies/README.md)
+- [Campaigns](/docs/campaigns//README.md)
